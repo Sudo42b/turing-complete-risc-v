@@ -10,6 +10,20 @@
 
 ## Current State Summary
 
+**다음 세션 계획 (사용자 지시 2026-09-15: "RV64G 전체를 다음 세션에서 다 만들자").** 지금 생성된 회로는
+ALU64 하나뿐이다. 순서와 선행 조건:
+1. 사용자가 게임에서 검증표 D1~D5 (ALU64 로드, 끊긴 선, 연산 결과, 커스텀 인스턴스 핀 배치) 결과를 알려 준다.
+   틀린 핀이 있으면 `tools/tcgen/pins.py` 를 고치고 `gen_alu64.py` 를 다시 돌린다. A1~A11 (ISA) 도 같이.
+2. 미확인 핀 확정: `constant` 출력, `static_indexer` 입력(-2 또는 -3), `add` cout. 작은 시험 부품 하나로 한 번에 확인.
+3. 모듈 생성 순서 (각각 `tools/gen_<모듈>.py` + 시뮬레이션 + 파운드리 `RV64G/<이름>`):
+   00-pc → 03-imm-gen → 02-decoder → 04-regfile(RAM+포트) → 06-branch → 07-lsu → 05-alu W형 래퍼 →
+   08-muldiv(M) → 09-csr(Zicsr/Zifencei) → 10-amo(A) → 11-fpu-f(F) → 12-fpu-d(D) → 99-top.
+   상위 보드는 커스텀 인스턴스 핀 규칙(D5)이 확정돼야 만들 수 있다. 확정 전에는 평면(flat) 보드로 대체 가능하나
+   샌드박스 크기 255 안에 들어가려면 압축 배선(레인 공유)이 필요하다.
+4. F/D 는 IEEE-754 연산기를 부품으로 조립해야 해서 가장 크다. 곱셈은 `mul` 부품(64비트 하위), 나눗셈은 `div`/`mod`
+   부품이 있으니 정수 M 은 작다. 부동소수점은 Unpack/Round/AddSub/Mul/Div/Sqrt/FMA/Cmp/Cvt 하위 부품으로 쪼갠다.
+5. 규칙 유지: 회로 바이너리는 저장소에 넣지 않는다(`build/` 는 .gitignore). 세이브 폴더는 게임을 끄고 만진다.
+
 **2026-09-15 오후 (세션 4 계속) 갱신 — 회로 생성 가능해짐.** 사용자가 "허브 회로처럼 네가 만들 수 없느냐"고 물어
 조사한 결과, 게임 개발자가 세이브 형식 라이브러리 save_monger(github.com/Stuffe/save_monger, CC0, v16 지원)를
 공개하고 있었다. `tools/tcsave/` 에 파이썬으로 이식했고(순수 파이썬 snappy 포함) 이 PC 의 v16 세이브 113/115 가
