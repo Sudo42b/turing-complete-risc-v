@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.pyc
+
+# 게임에서 내보낸 회로/캡처 원본은 components/<모듈>/ 에 넣되, 세이브 폴더 통째 복사는 금지
+schematics/
+
+# 작업용
+work/
+*.tmp
