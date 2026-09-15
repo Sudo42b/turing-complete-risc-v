@@ -11,7 +11,7 @@ import os
 
 from . import EXTENSIONS, ext_pseudo
 from .fields import fields_isa_text
-from .formats import render_isa, syntax_line
+from .formats import isa_token, render_isa, syntax_line
 
 SETTINGS = '''[settings]
 name = "RV64G"
@@ -30,7 +30,7 @@ def render_pseudo(p):
         if expr is None:              # 타입이 대신 검사
             continue
         lines.append('assert(%s, "%s: %s")' % (expr, p.mnemonic, msg))
-    lines.append(' '.join(p.mc))
+    lines.append(' '.join(isa_token(t) for t in p.mc))
     lines.append('# [%s] %s' % (p.ext, p.desc or p.mnemonic))
     return '\n'.join(lines)
 

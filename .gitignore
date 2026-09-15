@@ -8,3 +8,6 @@ schematics/
 # 작업용
 work/
 *.tmp
+
+# 생성한 회로 (tools/gen_*.py 로 재생성 가능)
+build/

@@ -10,6 +10,19 @@
 
 ## Current State Summary
 
+**2026-09-15 오후 (세션 4 계속) 갱신 — 회로 생성 가능해짐.** 사용자가 "허브 회로처럼 네가 만들 수 없느냐"고 물어
+조사한 결과, 게임 개발자가 세이브 형식 라이브러리 save_monger(github.com/Stuffe/save_monger, CC0, v16 지원)를
+공개하고 있었다. `tools/tcsave/` 에 파이썬으로 이식했고(순수 파이썬 snappy 포함) 이 PC 의 v16 세이브 113/115 가
+바이트 단위로 왕복 일치한다. 허브 아키텍처 "RISC-V"(id 130, RV32I) 와 캠페인 정답 회로에서 넷을 추적해 부품 핀
+좌표표(`tools/tcgen/pins.py`)를 만들었고, 선은 끝점에서만 연결된다(교차 7276개 관찰)는 것도 확인했다.
+`tools/tcgen/design.py` 가 넷리스트를 한 열 배치 + 레인 배선으로 `circuit.data` 로 만들고 검증하며,
+`tools/tcgen/sim.py` 로 게임에 넣기 전에 시뮬레이션한다. 첫 부품 `RV64G/ALU64`(`tools/gen_alu64.py`, 27부품 52선,
+400벡터 일치)를 `%APPDATA%\Turing Complete\schematics\foundry\RV64G\ALU64\circuit.data` 에 설치했다.
+게임에서는 아직 안 열어 봤다(검증표 D1~D5). 미확인: constant/static_indexer 핀, add cout, 커스텀 인스턴스 핀 배치 규칙.
+한편 ISA 는 A1 첫 오류(`%o[20]` 단일 비트 슬라이스 → `[20:20]` 필요)를 고쳐 재생성해 두었고, 188행까지는 파서를 통과했다.
+참고 도구: liquidhelium/verilog-target-turing-complete (Verilog→v6 세이브, yosys+ELK, 스크래치패드 vttc/ 에 빌드됨) 는
+대안 경로로 남겨 둔다. 다음: 사용자가 D1~D5 를 확인 → 결과로 핀표 수정 → 00-pc, 03-imm-gen, 04-regfile 순서로 생성.
+
 **2026-09-15 (세션 4) 갱신.** 사용자가 샌드박스에 아키텍처 `RV64G` 를 만들었다(`schematics\architecture\RV64G\`,
 `settings.txt` 의 `setting_loaded_architecture = RV64G`). 게임 자료와 폴더 관찰로 확정한 것:
 (1) 아키텍처 종류 레벨(The Sandbox, Maze …)은 세이브를 `schematics\architecture\<이름>\` 하나로 공유하고,

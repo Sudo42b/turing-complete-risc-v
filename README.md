@@ -8,7 +8,7 @@ RISC-V `RV64G`(RV64I + M + A + F + D + Zicsr + Zifencei)를 만드는 프로젝�
 | 갈래 | 위치 | 만드는 주체 |
 |---|---|---|
 | 어셈블러 정의(ISA), 참조 인코더, 테스트 프로그램, 설계 문서 | `isa/`, `tools/`, `tests/`, `components/*/README.md` | 텍스트라 에이전트가 만들고 여기서 관리 |
-| 회로 | 게임 안(파운드리 커스텀 부품, 아키텍처 세이브) | 게임 GUI로만 만들 수 있음. 완성되면 `components/<모듈>/` 에 허브 업로드 정보와 캡처를 남김 |
+| 회로 | `tools/gen_*.py` 가 `circuit.data` 를 생성해 파운드리에 넣음 (`docs/circuit-generation.md`) | 에이전트가 생성·시뮬레이션, 사용자가 게임에서 확인·허브 업로드 |
 
 컴포넌트(하드웨어 모듈)와 확장(ISA 조각)은 각각 따로 허브에 올릴 수 있도록 폴더 단위로 나눠 둡니다.
 
@@ -22,6 +22,10 @@ isa/
                              31_zicsr, 40_m, 50_a, 60_f, 70_d, 90_pseudo, 95_pseudo_experimental)
 tools/
   rv64g/                     명령 표(확장별 모듈) + .isa 생성기 + 참조 인코더
+  tcsave/                    circuit.data(버전 16) 읽기/쓰기 (개발자 공개 save_monger 이식)
+  tcgen/                     넷리스트 → 배치·배선 → circuit.data 생성기 + 시뮬레이터
+  gen_alu64.py               파운드리 부품 RV64G/ALU64 생성
+  tc_dump.py                 세이브 파일 요약/JSON
   gen_isa.py                 isa/ 를 다시 만든다
   rv_encode.py               .asm -> 기대 기계어 대조표
   selftest.py                표·인코더·생성기 자체 검사
@@ -31,6 +35,7 @@ tests/
 components/                  하드웨어 모듈별 설계 문서 (핀, 내부 구조, 배선 순서, 검증)
 docs/
   KICKOFF.md                 프로젝트 킥오프 메시지
+  circuit-generation.md      회로 생성 방식과 근거
   verification-checklist.md  게임 어셈블러·부품 동작 검증 항목
 ```
 

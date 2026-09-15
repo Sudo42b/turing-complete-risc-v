@@ -165,6 +165,15 @@ def definitions(instr):
 # .isa 텍스트
 # ---------------------------------------------------------------------------
 
+def isa_token(tok):
+    """기계어 토큰을 게임 문법으로. 게임 파서는 슬라이스에 항상 콜론을 요구하므로 %o[20] 은 %o[20:20] 으로 쓴다
+    (게임 오류: "Expected slice syntax after field/pattern reference in bit pattern", 2026-09-15 A1 에서 확인)."""
+    if tok.startswith('%') and '[' in tok and ':' not in tok:
+        n = tok[tok.index('[') + 1:-1]
+        return '%s[%s:%s]' % (tok[:tok.index('[')], n, n)
+    return tok
+
+
 FIELD_OF = {'reg': 'reg', 'freg': 'freg', 'rm': 'rm',
             'imm': 'immediate', 'imm20': 'immediate', 'imm32': 'immediate',
             'sh6': 'immediate', 'sh5': 'immediate', 'zimm': 'immediate',
@@ -206,7 +215,7 @@ def render_isa(instr):
             if expr is None:          # 타입이 대신 검사
                 continue
             lines.append('assert(%s, "%s: %s")' % (expr, instr.mnemonic, msg))
-        lines.append(' '.join(mc))
+        lines.append(' '.join(isa_token(t) for t in mc))
         lines.append('# [%s] %s' % (instr.ext, instr.desc or instr.mnemonic))
         blocks.append('\n'.join(lines))
     return '\n\n'.join(blocks)

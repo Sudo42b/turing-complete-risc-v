@@ -8,6 +8,7 @@
 3. 모든 명령의 .isa 블록이 32비트(또는 64비트) 기계어 줄을 만드는지 확인
 4. 니모닉·문법 중복 검사
 5. 모든 즉시값 피연산자에 크기 타입(:S12 등)이 붙었는지 확인 (게임 어셈블러 필수 조건)
+6. 기계어 줄의 슬라이스가 전부 [hi:lo] 꼴인지 확인 ([n] 은 게임이 거부)
 """
 import os
 import sys
@@ -180,6 +181,26 @@ def check_typed_immediates():
     return bad == 0
 
 
+def check_slices():
+    """게임 파서는 %x[n] 을 받지 않는다. 전체 ISA 텍스트의 모든 슬라이스에 콜론이 있는지 본다."""
+    text = full_text(True)
+    bad = 0
+    for line in text.split('\n'):
+        pos = 0
+        while True:
+            k = line.find('[', pos)
+            if k < 0:
+                break
+            close = line.find(']', k)
+            inner = line[k + 1:close] if close > k else ''
+            pos = k + 1
+            if inner.isdigit():
+                print('  FAIL single-index slice: %s' % line)
+                bad += 1
+    print('slices: %d failed' % bad)
+    return bad == 0
+
+
 def check_program():
     src = '''
 start:
@@ -200,7 +221,7 @@ end:
 
 def main():
     ok = True
-    for fn in (check_vectors, check_pseudo, check_isa_blocks, check_typed_immediates, check_program):
+    for fn in (check_vectors, check_pseudo, check_isa_blocks, check_typed_immediates, check_slices, check_program):
         try:
             ok = fn() and ok
         except (AsmError, AssertionError) as e:

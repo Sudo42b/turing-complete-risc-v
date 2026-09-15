@@ -46,84 +46,84 @@ beqz %a(reg), %t:U32(immediate | label)
 %o = %t - $start
 assert(%o % 2 == 0, "beqz: branch target must be 2-byte aligned")
 assert(%o >= -4096 && %o <= 4094, "beqz: branch target out of range (+-4 KiB)")
-%o[12] %o[10:5] 00000 %a[4:0] 000 %o[4:1] %o[11] 1100011
+%o[12:12] %o[10:5] 00000 %a[4:0] 000 %o[4:1] %o[11:11] 1100011
 # [pseudo] beq rs, x0, target
 
 bnez %a(reg), %t:U32(immediate | label)
 %o = %t - $start
 assert(%o % 2 == 0, "bnez: branch target must be 2-byte aligned")
 assert(%o >= -4096 && %o <= 4094, "bnez: branch target out of range (+-4 KiB)")
-%o[12] %o[10:5] 00000 %a[4:0] 001 %o[4:1] %o[11] 1100011
+%o[12:12] %o[10:5] 00000 %a[4:0] 001 %o[4:1] %o[11:11] 1100011
 # [pseudo] bne rs, x0, target
 
 blez %b(reg), %t:U32(immediate | label)
 %o = %t - $start
 assert(%o % 2 == 0, "blez: branch target must be 2-byte aligned")
 assert(%o >= -4096 && %o <= 4094, "blez: branch target out of range (+-4 KiB)")
-%o[12] %o[10:5] %b[4:0] 00000 101 %o[4:1] %o[11] 1100011
+%o[12:12] %o[10:5] %b[4:0] 00000 101 %o[4:1] %o[11:11] 1100011
 # [pseudo] bge x0, rs, target
 
 bgez %a(reg), %t:U32(immediate | label)
 %o = %t - $start
 assert(%o % 2 == 0, "bgez: branch target must be 2-byte aligned")
 assert(%o >= -4096 && %o <= 4094, "bgez: branch target out of range (+-4 KiB)")
-%o[12] %o[10:5] 00000 %a[4:0] 101 %o[4:1] %o[11] 1100011
+%o[12:12] %o[10:5] 00000 %a[4:0] 101 %o[4:1] %o[11:11] 1100011
 # [pseudo] bge rs, x0, target
 
 bltz %a(reg), %t:U32(immediate | label)
 %o = %t - $start
 assert(%o % 2 == 0, "bltz: branch target must be 2-byte aligned")
 assert(%o >= -4096 && %o <= 4094, "bltz: branch target out of range (+-4 KiB)")
-%o[12] %o[10:5] 00000 %a[4:0] 100 %o[4:1] %o[11] 1100011
+%o[12:12] %o[10:5] 00000 %a[4:0] 100 %o[4:1] %o[11:11] 1100011
 # [pseudo] blt rs, x0, target
 
 bgtz %b(reg), %t:U32(immediate | label)
 %o = %t - $start
 assert(%o % 2 == 0, "bgtz: branch target must be 2-byte aligned")
 assert(%o >= -4096 && %o <= 4094, "bgtz: branch target out of range (+-4 KiB)")
-%o[12] %o[10:5] %b[4:0] 00000 100 %o[4:1] %o[11] 1100011
+%o[12:12] %o[10:5] %b[4:0] 00000 100 %o[4:1] %o[11:11] 1100011
 # [pseudo] blt x0, rs, target
 
 bgt %a(reg), %b(reg), %t:U32(immediate | label)
 %o = %t - $start
 assert(%o % 2 == 0, "bgt: branch target must be 2-byte aligned")
 assert(%o >= -4096 && %o <= 4094, "bgt: branch target out of range (+-4 KiB)")
-%o[12] %o[10:5] %a[4:0] %b[4:0] 100 %o[4:1] %o[11] 1100011
+%o[12:12] %o[10:5] %a[4:0] %b[4:0] 100 %o[4:1] %o[11:11] 1100011
 # [pseudo] blt rs2, rs1, target
 
 ble %a(reg), %b(reg), %t:U32(immediate | label)
 %o = %t - $start
 assert(%o % 2 == 0, "ble: branch target must be 2-byte aligned")
 assert(%o >= -4096 && %o <= 4094, "ble: branch target out of range (+-4 KiB)")
-%o[12] %o[10:5] %a[4:0] %b[4:0] 101 %o[4:1] %o[11] 1100011
+%o[12:12] %o[10:5] %a[4:0] %b[4:0] 101 %o[4:1] %o[11:11] 1100011
 # [pseudo] bge rs2, rs1, target
 
 bgtu %a(reg), %b(reg), %t:U32(immediate | label)
 %o = %t - $start
 assert(%o % 2 == 0, "bgtu: branch target must be 2-byte aligned")
 assert(%o >= -4096 && %o <= 4094, "bgtu: branch target out of range (+-4 KiB)")
-%o[12] %o[10:5] %a[4:0] %b[4:0] 110 %o[4:1] %o[11] 1100011
+%o[12:12] %o[10:5] %a[4:0] %b[4:0] 110 %o[4:1] %o[11:11] 1100011
 # [pseudo] bltu rs2, rs1, target
 
 bleu %a(reg), %b(reg), %t:U32(immediate | label)
 %o = %t - $start
 assert(%o % 2 == 0, "bleu: branch target must be 2-byte aligned")
 assert(%o >= -4096 && %o <= 4094, "bleu: branch target out of range (+-4 KiB)")
-%o[12] %o[10:5] %a[4:0] %b[4:0] 111 %o[4:1] %o[11] 1100011
+%o[12:12] %o[10:5] %a[4:0] %b[4:0] 111 %o[4:1] %o[11:11] 1100011
 # [pseudo] bgeu rs2, rs1, target
 
 j %t:U32(immediate | label)
 %o = %t - $start
 assert(%o % 2 == 0, "j: jump target must be 2-byte aligned")
 assert(%o >= -1048576 && %o <= 1048574, "j: jump target out of range (+-1 MiB)")
-%o[20] %o[10:1] %o[11] %o[19:12] 00000 1101111
+%o[20:20] %o[10:1] %o[11:11] %o[19:12] 00000 1101111
 # [pseudo] jal x0, target
 
 jal %t:U32(immediate | label)
 %o = %t - $start
 assert(%o % 2 == 0, "jal: jump target must be 2-byte aligned")
 assert(%o >= -1048576 && %o <= 1048574, "jal: jump target out of range (+-1 MiB)")
-%o[20] %o[10:1] %o[11] %o[19:12] 00001 1101111
+%o[20:20] %o[10:1] %o[11:11] %o[19:12] 00001 1101111
 # [pseudo] jal x1, target
 
 jr %a(reg)

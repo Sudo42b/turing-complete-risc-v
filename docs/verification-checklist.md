@@ -25,6 +25,8 @@
 | Symphony 레벨 설명 "256 Byte Ram", "'load_8' … loads 8 bits, 'store_16' … stores 16 bits from that address" | RAM 주소는 바이트 단위 | B4 = 바이트 주소(예상). 레지스터 파일은 주소 = idx << 3 |
 | 부품 설명 "The file rom outputs the content of a file 8 bytes at a time. The highest 64 bit address (0xFFFFFFFFFFFFFFFF) is special and outputs the length of the file in bytes." | 파일 ROM 부품이 있다 | 나중에 바이너리를 프로그램 RAM 에 넣는 경로 후보 |
 | 실행 파일의 부품 id 목록(com_ram, com_load_port, com_pipelined_load_port, com_store_port, com_probe_wire_asm …)에 com_program 이 없고, 레벨 `unlocks_components` 에도 없다. 게임 문구 "Programmable memory component", "Edit program" | 별도 Program 부품이 없다. RAM 이 프로그램 메모리이고 그 편집 아이콘이 IDE(`spec.isa` 탭)를 연다 | 01-ifetch: 빠른 RAM 하나를 프로그램 RAM 으로 쓴다. RAM(`ram_component`)과 포트(`overture_4_program`)는 이미 해결한 레벨이라 열려 있다 |
+| 허브에서 받은 아키텍처(`schematics\architecture\schematic_hub\<이름>\`)의 배치: `circuit.data`, `spec.isa`, `new_program.asm`, `sandbox\*.asm`, `sandbox\<부품id>.bin`(RAM 내용) | ISA 는 아키텍처 폴더 루트의 `spec.isa` 하나. 프로그램은 `sandbox\` 바로 아래 `.asm` | B12 확정. `RV64G\spec.isa` 가 맞는 자리다 |
+| 허브 "Platformer Game (Remake)" 의 `spec.isa` 가 `%x:S33(immediate)`, `%x:S17(immediate|label)` 를 쓴다. 허브 "RISC-V"(RV32I, id 130)는 `%i:U12(immediate)(%a(reg))` 메모리 문법, `%i[11:0]` 슬라이싱과 `ddddd` 한 글자 방식 혼용, `U20(immediate|label)` 을 쓴다 | 폭 33 까지의 부호 있는 타입이 실제로 로드된다. 슬라이싱·한 글자 혼용·`immediate|label` 도 실전 사례가 있다 | A11 은 S33 까지 사실상 통과. 남는 미검증은 단언문·가상 피연산자·`$start`(허브 ISA 어디에도 없음) → A3, A4 |
 | 레벨 세이브 폴더에 `spec.isa` 가 `circuit.data` 옆에 있다(`schematics\overture_4_program\Default\`) | 커스텀 아키텍처도 같은 배치일 가능성 | B12 예상: `schematics\architecture\RV64G\spec.isa` |
 
 ## A. 어셈블러 (ISA 정의)
@@ -62,7 +64,7 @@ A5 가 실패하면 `isa/rv64g_no_experimental.isa` 를 쓰고 `li32`/`la`/`call
 | B9 | `div`/`mod` 부품이 부호 있는 연산인가, 0으로 나누면 무엇이 나오는가 | -7 / 2, 7 / 0 | 게임 레벨 문구: 캠페인 나눗셈 레벨은 0 나누기에 0(몫)과 피제수(나머지)를 요구. 기본 부품의 동작은 별개 / 게임: |
 | B10 | `add` 부품에 캐리 입력/출력 핀이 있는가 (mulhu 캐리 처리용) | 부품 핀 확인 | 예상: 있음 (레벨 문구 "Carry in", "Carry out") / 게임: |
 | B11 | 샌드박스 보드(255) 안에 몇 개 부품이 들어가는가, 파운드리 부품 중첩 깊이 제한 | 대략 확인 | |
-| B12 | 커스텀 아키텍처 폴더에 ISA 파일이 어떤 이름으로 저장되는가 | `%APPDATA%\Turing Complete\schematics\architecture\RV64G\` 확인 | 예상: `spec.isa` / 게임: 2026-09-15 아키텍처 생성 직후에는 `circuit.data` 와 `sandbox/sandbox/{sandbox.json,sandbox.v}` 만 생기고 ISA 파일은 없음. 레벨 세이브는 Program 부품이 있을 때 `spec.isa` + `new_program.asm`(CRLF) 을 만듦. 같은 이름으로 미리 넣어 둠. RAM 의 메모리 내용은 `<아키텍처>\sandbox\<부품id>.bin`(레벨별). 게임이 ISA 를 어디서 읽는지는 IDE(RAM 의 "프로그램 편집")를 열어 봐야 확정 |
+| B12 | 커스텀 아키텍처 폴더에 ISA 파일이 어떤 이름으로 저장되는가 | `%APPDATA%\Turing Complete\schematics\architecture\RV64G\` 확인 | 예상: `spec.isa` / 게임: 2026-09-15 아키텍처 생성 직후에는 `circuit.data` 와 `sandbox/sandbox/{sandbox.json,sandbox.v}` 만 생기고 ISA 파일은 없음. 레벨 세이브는 Program 부품이 있을 때 `spec.isa` + `new_program.asm`(CRLF) 을 만듦. 같은 이름으로 미리 넣어 둠. RAM 의 메모리 내용은 `<아키텍처>\sandbox\<부품id>.bin`(레벨별). 허브 아키텍처 배치로 확정: ISA 는 `<아키텍처>\spec.isa`, 프로그램은 `<아키텍처>\sandbox\*.asm` (2026-09-15) |
 
 ## C. 결과에 따른 설계 분기
 
@@ -73,3 +75,14 @@ A5 가 실패하면 `isa/rv64g_no_experimental.isa` 를 쓰고 `li32`/`la`/`call
 - B8 이 "하위 64비트만"이면 `mulh*` 를 32비트 부분곱 4개로 만든다 (`components/08-muldiv`).
 - B11 이 빠듯하면 FPU 를 파운드리 커스텀 부품으로 캡슐화하고, 필요하면 F 를 먼저 완성한 뒤 D 를 별도 부품으로 둔다.
 - A11 에서 폭 상한이 나오면 `TYPE_OF` 를 줄이고 재생성한다.
+
+## D. 생성 회로 (에이전트가 만든 circuit.data, `docs/circuit-generation.md`)
+
+| # | 항목 | 확인 방법 | 결과 |
+|---|---|---|---|
+| D1 | 파운드리 `RV64G/ALU64` 가 열리는가 | 파운드리 → RV64G → ALU64. 오류 문구가 있으면 원문 기록 | |
+| D2 | 선 끝이 전부 핀에 붙었는가 | 부품 안에서 끊긴 선(빨간 끝)이 없는지. 있으면 어느 부품의 어느 쪽인지 | |
+| D3 | 덧셈·뺄셈·시프트·비교 결과 | 샌드박스에 ALU64 를 놓고 a, b, funct3, alt 에 상수/스위치, y 에 프로브. funct3 0..7 각 1회 | |
+| D4 | 시프트량 ≥ 64 일 때 게임 시프터 동작 | `sll` 에 b = 64, 65 | |
+| D5 | 커스텀 부품 인스턴스의 핀 배치 | ALU64 를 놓았을 때 핀이 어느 변에 어떤 순서로 나오는지 (a, b, funct3, alt / y) | |
+| D6 | `constant`, `static_indexer` 핀 위치 | 다음 생성 부품에서 | |
